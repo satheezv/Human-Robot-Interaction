@@ -1,0 +1,39 @@
+<launch>
+<!-- Static tf reference -->
+    <node pkg="tf" type="static_transform_publisher" name="map_rotated_tf_publisher"
+            args="0 0 0 0.18 0 0 map_corrected map 100" /> 
+    <node pkg="tf" type="static_transform_publisher" name="ref_1_tf_publisher"
+            args="-0.3 1.7 -0.72 0 0 0 ref_1 map_corrected 100" /> 
+    <node pkg="tf" type="static_transform_publisher" name="ref_2_tf_publisher"
+            args="1.65 -2.6  0.0 0 0 0 ref_2 ref_1 100" /> 
+    <node pkg="nav_goal_publisher" type="irohms_vicon_calibrator.py" name="irohms_vicon_calibrator" output="screen"/>
+<!-- Reasoner -->
+    <node pkg="nav_goal_publisher" type="irohms_reasoner.sh" 
+         args="$(find nav_goal_publisher)/scripts/irohms_reasoner/irohms_reasoner_1.py" 
+         name="reasoner_interface" output="screen">
+    </node>  
+<!-- Publish a navigation goal according to the reasoner -->
+    <node pkg="nav_goal_publisher" type="goal_publisher.py" name="reasoner_navigator" output="screen"/>
+<!-- Right Gripper -->
+    <node pkg="nav_goal_publisher" type="goal_right_gripper.py" name="reasoner_right_gripper" output="screen"/>
+<!-- Left Gripper-->
+    <node pkg="nav_goal_publisher" type="goal_left_gripper.py" name="reasoner_left_gripper" output="screen"/>
+<!-- Right Arm -->
+    <node pkg="nav_goal_publisher" type="goal_right_arm.py" name="reasoner_right_arm" output="screen"/>
+<!-- Left Arm -->
+    <node pkg="nav_goal_publisher" type="goal_left_arm.py" name="reasoner_left_arm" output="screen"/>
+<!-- Torso -->
+    <node pkg="nav_goal_publisher" type="goal_torso.py" name="reasoner_torso" output="screen"/>
+<!-- Moveit -->
+<node pkg="nav_goal_publisher" type="karate_pose.py" name="reasoner_karate" output="screen"/>
+
+    <include file="$(find moveit)/launch/move_group.launch" />
+    
+<!-- Vicon bridge -->
+    <include file="$(find vicon_bridge)/launch/vicon.launch" />
+
+  <!-- State Space --> 
+<node pkg="nav_goal_publisher" type="Frames_statespace.py"
+          name="broadcaster_fixed" />
+ 
+</launch>
